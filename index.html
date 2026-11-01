@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>藏书室 · 阅读记录</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23713D43'/%3E%3Cpath d='M15 15h25a9 9 0 0 1 9 9v25H24a9 9 0 0 1-9-9z' fill='%23F5F0E8'/%3E%3Cpath d='M24 15v34m0-34a9 9 0 0 0-9 9v16a9 9 0 0 0 9 9m0-34h16a9 9 0 0 1 9 9v25' fill='none' stroke='%23D8B98C' stroke-width='3'/%3E%3Cpath d='M29 26h13M29 33h13' stroke='%23713D43' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+:root {
+  --site-primary: #713D43;
+  --site-on-primary: #FFFFFF;
+  --site-secondary: #E9DCCB;
+  --site-on-secondary: #342B27;
+  --site-background: #F5F0E8;
+  --site-on-background: #302925;
+  --site-font-body: "Iowan Old Style", "Noto Serif SC", "Songti SC", Georgia, serif;
+  --site-font-heading: "Iowan Old Style", "Noto Serif SC", "Songti SC", Georgia, serif;
+  --site-heading-scale: 1;
+  --site-spacing-scale: 1;
+  --site-radius-scale: 1;
+  --site-decoration-opacity: 1;
+  color-scheme: light dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--site-background); color: var(--site-on-background); font-family: var(--site-font-body); }
+.app { min-height: 100vh; width: 100%; background-color: var(--site-background); color: var(--site-on-background); }
+.topbar { background: var(--site-primary); color: var(--site-on-primary); padding: calc(22px * var(--site-spacing-scale)) clamp(20px, 5vw, 72px); display:flex; align-items:center; justify-content:space-between; gap:20px; }
+.brand { display:flex; align-items:center; gap:13px; }
+.brand-mark { width:38px; height:38px; border:1px solid rgba(255,255,255,.55); border-radius:50%; display:grid; place-items:center; font-size:20px; }
+.brand-name { font-size:17px; letter-spacing:.18em; }
+.brand-sub { font:10px Arial,sans-serif; opacity:.72; letter-spacing:.22em; margin-top:4px; }
+.top-note { font-size:12px; opacity:.8; letter-spacing:.12em; }
+main { max-width:1200px; margin:auto; padding: clamp(28px,5vw,64px) clamp(18px,5vw,52px) 80px; }
+.hero { display:flex; justify-content:space-between; align-items:flex-end; gap:24px; margin-bottom:34px; }
+.eyebrow { color:var(--site-primary); font:11px Arial,sans-serif; letter-spacing:.2em; text-transform:uppercase; }
+h1 { font-size:calc(clamp(32px,5vw,48px) * var(--site-heading-scale)); font-weight:500; letter-spacing:.04em; margin:10px 0 8px; }
+.subtitle { color: light-dark(#766B62,#C5B9AC); font-size:14px; }
+.primary-btn, .soft-btn, .tab, .icon-btn { cursor:pointer; font:inherit; transition:.2s ease; }
+.primary-btn { border:0; background:var(--site-primary); color:var(--site-on-primary); padding:13px 21px; border-radius:calc(5px * var(--site-radius-scale)); font-size:13px; letter-spacing:.08em; white-space:nowrap; }
+.primary-btn:hover { filter:brightness(1.12); transform:translateY(-1px); }
+.stats { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin:28px 0 42px; }
+.stat { background:light-dark(#FFFCF7,#282421); border:1px solid light-dark(#E7DED3,#49413B); padding:19px 20px; border-radius:calc(7px * var(--site-radius-scale)); }
+.stat-label { font:10px Arial,sans-serif; letter-spacing:.16em; color:light-dark(#82766D,#B7A99B); }
+.stat-value { font-size:27px; margin-top:9px; }
+.stat-unit { font-size:12px; color:light-dark(#8B8077,#B7A99B); margin-left:5px; }
+.toolbar { display:flex; align-items:center; justify-content:space-between; gap:16px; border-bottom:1px solid light-dark(#DCD1C5,#514840); padding-bottom:13px; margin-bottom:22px; }
+.tabs { display:flex; gap:24px; }
+.tab { background:none; border:0; color:light-dark(#82766D,#B7A99B); padding:8px 0; font-size:14px; position:relative; }
+.tab.active { color:var(--site-primary); font-weight:600; }
+.tab.active:after { content:""; height:2px; background:var(--site-primary); position:absolute; bottom:-14px; left:0; right:0; }
+.search { width:min(230px,40vw); border:1px solid light-dark(#DCD1C5,#514840); border-radius:4px; padding:9px 12px; background:light-dark(#FFFCF7,#282421); color:var(--site-on-background); font:13px Arial,sans-serif; outline:none; }
+.search:focus, input:focus, textarea:focus { border-color:var(--site-primary); }
+.book-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:25px 20px; }
+.book-card { min-width:0; }
+.cover-wrap { position:relative; height:220px; background:var(--site-secondary); border-radius:4px; overflow:hidden; box-shadow:0 7px 18px rgba(45,32,25,.10); }
+.cover { width:100%; height:100%; object-fit:cover; display:block; }
+.cover-placeholder { height:100%; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:20px; color:#715C50; background:linear-gradient(145deg,#E9DCCB,#D8C4AE); }
+.cover-placeholder .ornament { font-size:24px; margin-bottom:14px; }
+.cover-placeholder .placeholder-title { font-size:18px; line-height:1.5; }
+.cover-placeholder .placeholder-author { font-size:11px; margin-top:10px; opacity:.75; }
+.book-state { position:absolute; top:10px; left:10px; background:rgba(250,246,239,.93); color:#67444A; padding:5px 8px; font:10px Arial,sans-serif; letter-spacing:.08em; border-radius:2px; }
+.book-info { padding:13px 2px 0; }
+.book-title { font-size:16px; line-height:1.5; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.book-author { color:light-dark(#897D73,#B7A99B); font-size:12px; margin-top:3px; }
+.progress-row { display:flex; justify-content:space-between; gap:8px; margin-top:13px; font:11px Arial,sans-serif; color:light-dark(#786D64,#B7A99B); }
+.progress-track { height:4px; background:light-dark(#E5DCD1,#514840); border-radius:10px; margin-top:7px; overflow:hidden; }
+.progress-fill { height:100%; background:var(--site-primary); border-radius:10px; }
+.book-meta { display:flex; justify-content:space-between; margin-top:10px; color:light-dark(#95897E,#B7A99B); font:10px Arial,sans-serif; }
+.card-actions { display:flex; gap:7px; margin-top:12px; }
+.soft-btn { background:transparent; border:1px solid light-dark(#D8CDC1,#514840); color:light-dark(#665B53,#D0C4B8); border-radius:3px; padding:6px 9px; font-size:11px; }
+.soft-btn:hover { border-color:var(--site-primary); color:var(--site-primary); }
+.empty { grid-column:1/-1; text-align:center; padding:70px 20px; color:light-dark(#82766D,#B7A99B); }
+.empty-symbol { font-size:34px; margin-bottom:15px; }
+.footer { text-align:center; margin-top:64px; color:light-dark(#9B8E82,#8F8277); font-size:11px; letter-spacing:.12em; }
+.modal-backdrop { position:fixed; inset:0; z-index:5; background:rgba(24,20,18,.56); display:none; align-items:center; justify-content:center; padding:18px; }
+.modal-backdrop.open { display:flex; }
+.modal { width:min(570px,100%); max-height:92vh; overflow:auto; background:light-dark(#FBF8F2,#282421); color:var(--site-on-background); border-radius:7px; padding:28px; box-shadow:0 20px 70px rgba(0,0,0,.25); }
+.modal-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:22px; }
+.modal-head h2 { font-size:24px; font-weight:500; margin:0; }
+.close { border:0; background:none; color:inherit; font-size:25px; cursor:pointer; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:15px; }
+.field { display:flex; flex-direction:column; gap:7px; min-width:0; }
+.field.full { grid-column:1/-1; }
+.field label { font-size:12px; color:light-dark(#766B62,#C5B9AC); }
+.field input, .field textarea, .field select { width:100%; padding:11px 12px; border:1px solid light-dark(#DED4C9,#514840); background:light-dark(#FFFCF7,#211F1D); color:var(--site-on-background); border-radius:3px; font:13px Arial,sans-serif; outline:none; }
+.field textarea { resize:vertical; min-height:70px; }
+.cover-upload { border:1px dashed light-dark(#CBBDAF,#675A50); padding:15px; display:flex; align-items:center; gap:14px; border-radius:4px; }
+.upload-preview { width:48px; height:62px; object-fit:cover; background:var(--site-secondary); }
+.upload-label { font-size:12px; color:light-dark(#766B62,#C5B9AC); }
+.upload-label strong { display:block; color:var(--site-primary); margin-bottom:5px; }
+.modal-actions { display:flex; justify-content:flex-end; gap:9px; margin-top:22px; }
+@media(max-width:850px) { .book-grid{grid-template-columns:repeat(3,minmax(0,1fr));} .cover-wrap{height:205px;} }
+@media(max-width:620px) { .top-note{display:none;} .hero{align-items:flex-start; flex-direction:column;} .stats{grid-template-columns:repeat(2,1fr); margin:24px 0 32px;} .book-grid{grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px 14px;} .cover-wrap{height:210px;} .toolbar{align-items:flex-end;} .tabs{gap:15px;} .tab{font-size:13px;} .search{width:125px;} .form-grid{grid-template-columns:1fr;} .field.full{grid-column:auto;} .modal{padding:22px;} }
+@media(max-width:370px){.cover-wrap{height:175px}.tabs{gap:10px}}
+@media(prefers-color-scheme:dark){.tab.active{color:#D7AAA6}.progress-fill{background:#B77B7C}.primary-btn{background:#89545A}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand"><div class="brand-mark">✦</div><div><div class="brand-name">THE READING ROOM</div><div class="brand-sub">A PRIVATE LIBRARY</div></div></div>
+    <div class="top-note">给思想留一间安静的房间</div>
+  </header>
+  <main>
+    <section class="hero">
+      <div><div class="eyebrow">YOUR PERSONAL LIBRARY</div><h1>我的阅读书架</h1><div class="subtitle">每一本读过的书，都是走过的一段路。</div></div>
+      <button class="primary-btn" id="addBtn">＋ 添加一本书</button>
+    </section>
+    <section class="stats">
+      <div class="stat"><div class="stat-label">全部藏书</div><div class="stat-value" id="totalStat">0<span class="stat-unit">本</span></div></div>
+      <div class="stat"><div class="stat-label">正在阅读 / 计划阅读</div><div class="stat-value" id="plannedStat">0<span class="stat-unit">本</span></div></div>
+      <div class="stat"><div class="stat-label">已经读完</div><div class="stat-value" id="finishedStat">0<span class="stat-unit">本</span></div></div>
+      <div class="stat"><div class="stat-label">累计阅读</div><div class="stat-value" id="pagesStat">0<span class="stat-unit">页</span></div></div>
+    </section>
+    <section>
+      <div class="toolbar"><div class="tabs"><button class="tab active" data-tab="all">全部</button><button class="tab" data-tab="reading">计划阅读</button><button class="tab" data-tab="finished">已读完</button></div><input class="search" id="search" placeholder="⌕ 搜索书名 / 作者"></div>
+      <div class="book-grid" id="bookGrid"></div>
+    </section>
+    <div class="footer">READ SLOWLY · THINK DEEPLY · KEEP CURIOUS</div>
+  </main>
+</div>
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-head"><h2 id="modalTitle">把一本书放上书架</h2><button class="close" id="closeModal" aria-label="关闭">×</button></div>
+    <form id="bookForm">
+      <div class="form-grid">
+        <div class="field full"><label>书籍封面</label><div class="cover-upload"><img id="uploadPreview" class="upload-preview" alt="封面预览"><div class="upload-label"><strong>选择本地图片上传</strong>JPG、PNG 或 WebP 均可<input type="file" id="coverInput" accept="image/*" style="display:block;margin-top:7px;font-size:11px;max-width:100%"></div></div></div>
+        <div class="field"><label for="titleInput">书名 *</label><input id="titleInput" required maxlength="100" placeholder="例如：巴别塔"></div>
+        <div class="field"><label for="authorInput">作者</label><input id="authorInput" maxlength="80" placeholder="作者姓名"></div>
+        <div class="field"><label for="totalPages">总页数 *</label><input id="totalPages" type="number" min="1" required placeholder="例如：480"></div>
+        <div class="field"><label for="currentPages">目前读了多少页</label><input id="currentPages" type="number" min="0" value="0" placeholder="0"></div>
+        <div class="field"><label for="dailyPages">每日计划阅读（页）</label><input id="dailyPages" type="number" min="0" value="20" placeholder="20"></div>
+        <div class="field"><label for="deadline">计划读完日期</label><input id="deadline" type="date"></div>
+        <div class="field"><label for="statusInput">书籍状态</label><select id="statusInput"><option value="reading">计划阅读</option><option value="finished">已读完</option></select></div>
+        <div class="field full"><label for="notesInput">阅读笔记 / 备注</label><textarea id="notesInput" placeholder="想记录的句子、感想，或这本书的来历……"></textarea></div>
+      </div>
+      <div class="modal-actions"><button type="button" class="soft-btn" id="cancelBtn">取消</button><button class="primary-btn" type="submit">保存到书架</button></div>
+    </form>
+  </div>
+</div>
+<script>
+(() => {
+  const KEY = 'the-reading-room-books-v1';
+  let books = loadBooks();
+  let activeTab = 'all';
+  let editingId = null;
+  let pendingCover = '';
+  const $ = id => document.getElementById(id);
+  const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  function loadBooks(){ try { const raw=JSON.parse(localStorage.getItem(KEY)||'[]'); return Array.isArray(raw)?raw:[]; } catch { return []; } }
+  function save(){ try { localStorage.setItem(KEY, JSON.stringify(books)); } catch { alert('本地存储空间不足。请尝试使用较小的封面图片后再保存。'); } }
+  function today(){ const d=new Date(); return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10); }
+  function daysLeft(date){ if(!date)return null; return Math.ceil((new Date(date+'T00:00:00')-new Date(today()+'T00:00:00'))/86400000); }
+  function progress(book){ return Math.min(100,Math.round((Number(book.currentPages||0)/Math.max(1,Number(book.totalPages||1)))*100)); }
+  function coverMarkup(book){ return book.cover ? `<img class="cover" src="${book.cover}" alt="${esc(book.title)}封面">` : `<div class="cover-placeholder"><div class="ornament">✦</div><div class="placeholder-title">${esc(book.title)}</div><div class="placeholder-author">${esc(book.author||'')}</div></div>`; }
+  function render(){
+    const reading=books.filter(b=>b.status!=='finished'); const finished=books.filter(b=>b.status==='finished');
+    $('totalStat').innerHTML=`${books.length}<span class="stat-unit">本</span>`;
+    $('plannedStat').innerHTML=`${reading.length}<span class="stat-unit">本</span>`;
+    $('finishedStat').innerHTML=`${finished.length}<span class="stat-unit">本</span>`;
+    $('pagesStat').innerHTML=`${books.reduce((s,b)=>s+Math.min(Number(b.currentPages||0),Number(b.totalPages||0)),0).toLocaleString()}<span class="stat-unit">页</span>`;
+    const q=$('search').value.trim().toLowerCase();
+    const list=books.filter(b=>(activeTab==='all'||(activeTab==='reading'?b.status!=='finished':b.status==='finished')) && `${b.title} ${b.author||''}`.toLowerCase().includes(q));
+    $('bookGrid').innerHTML=list.length?list.map(b=>{
+      const pct=progress(b), left=daysLeft(b.deadline), remaining=Math.max(0,Number(b.totalPages)-Number(b.currentPages||0));
+      let dateText=b.status==='finished'?'已完成':b.deadline?(left<0?`已逾期 ${Math.abs(left)} 天`:left===0?'今天截止':`还剩 ${left} 天`):'未设置截止日期';
+      const pace=b.dailyPages>0?`每日 ${b.dailyPages} 页`:'未设置每日目标';
+      return `<article class="book-card"><div class="cover-wrap">${coverMarkup(b)}<span class="book-state">${b.status==='finished'?'已读完':'计划阅读'}</span></div><div class="book-info"><div class="book-title" title="${esc(b.title)}">${esc(b.title)}</div><div class="book-author">${esc(b.author||'未填写作者')}</div><div class="progress-row"><span>${b.status==='finished'?'阅读完成':'阅读进度'}</span><span>${Math.min(Number(b.currentPages||0),Number(b.totalPages))} / ${Number(b.totalPages)} 页 · ${pct}%</span></div><div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div><div class="book-meta"><span>${esc(dateText)}</span><span>${esc(pace)}</span></div><div class="card-actions">${b.status==='finished'?`<button class="soft-btn" data-action="reopen" data-id="${b.id}">重新阅读</button>`:`<button class="soft-btn" data-action="progress" data-id="${b.id}">＋ 记录进度</button><button class="soft-btn" data-action="finish" data-id="${b.id}">读完了</button>`}<button class="soft-btn" data-action="edit" data-id="${b.id}">编辑</button></div></div></article>`;
+    }).join(''):`<div class="empty"><div class="empty-symbol">☷</div><div>${q?'没有找到符合条件的书籍':'书架还很安静。添加一本书，开始你的阅读旅程吧。'}</div></div>`;
+  }
+  function openModal(book=null){
+    editingId=book?.id??null; pendingCover=book?.cover||'';
+    $('modalTitle').textContent=book?'编辑书籍':'把一本书放上书架';
+    $('titleInput').value=book?.title||''; $('authorInput').value=book?.author||'';
+    $('totalPages').value=book?.totalPages??''; $('currentPages').value=book?.currentPages??0;
+    $('dailyPages').value=book?.dailyPages??20; $('deadline').value=book?.deadline||'';
+    $('statusInput').value=book?.status||'reading'; $('notesInput').value=book?.notes||'';
+    $('uploadPreview').src=pendingCover||'data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="48" height="62"><rect width="100%" height="100%" fill="#E9DCCB"/><text x="50%" y="55%" text-anchor="middle" fill="#715C50" font-size="20">✦</text></svg>');
+    $('coverInput').value=''; $('modalBackdrop').classList.add('open'); $('titleInput').focus();
+  }
+  function closeModal(){ $('modalBackdrop').classList.remove('open'); }
+  $('addBtn').addEventListener('click',()=>openModal());
+  $('closeModal').addEventListener('click',closeModal); $('cancelBtn').addEventListener('click',closeModal);
+  $('modalBackdrop').addEventListener('click',e=>{if(e.target===$('modalBackdrop'))closeModal();});
+  $('coverInput').addEventListener('change',e=>{ const file=e.target.files?.[0]; if(!file)return; if(!file.type.startsWith('image/')){alert('请选择图片文件。');return;} if(file.size>5*1024*1024){alert('封面图片请控制在 5MB 以内。');e.target.value='';return;} const reader=new FileReader(); reader.onload=()=>{pendingCover=reader.result;$('uploadPreview').src=pendingCover;};reader.readAsDataURL(file); });
+  $('bookForm').addEventListener('submit',e=>{
+    e.preventDefault(); const total=Number($('totalPages').value), current=Number($('currentPages').value||0), daily=Number($('dailyPages').value||0);
+    if(current<0||daily<0||total<1){alert('页数和每日计划不能为负数，总页数至少为 1。');return;}
+    if(current>total){alert('目前阅读页数不能超过总页数。');return;}
+    const status=$('statusInput').value; const data={id:editingId||`${Date.now()}-${Math.random().toString(16).slice(2)}`,title:$('titleInput').value.trim(),author:$('authorInput').value.trim(),totalPages:total,currentPages:status==='finished'?total:current,dailyPages:daily,deadline:$('deadline').value,status,notes:$('notesInput').value,cover:pendingCover};
+    if(editingId){books=books.map(b=>b.id===editingId?data:b);}else{books.unshift(data);} save();render();closeModal();
+  });
+  $('bookGrid').addEventListener('click',e=>{
+    const btn=e.target.closest('button[data-action]'); if(!btn)return; const b=books.find(x=>x.id===btn.dataset.id); if(!b)return;
+    switch(btn.dataset.action){
+      case 'edit':openModal(b);break;
+      case 'finish':if(confirm(`将《${b.title}》标记为已读完？`)){b.status='finished';b.currentPages=Number(b.totalPages);save();render();}break;
+      case 'reopen':b.status='reading';b.currentPages=Math.min(Number(b.currentPages),Number(b.totalPages));save();render();break;
+      case 'progress':{const value=prompt(`《${b.title}》\n目前已读 ${b.currentPages} 页，共 ${b.totalPages} 页。\n请输入最新的累计阅读页数：`,b.currentPages);if(value===null)return;const n=Number(value);if(!Number.isInteger(n)||n<0||n>Number(b.totalPages)){alert('请输入 0 到总页数之间的整数。');return;}b.currentPages=n;if(n>=Number(b.totalPages)){b.status='finished';}save();render();break;}
+    }
+  });
+  document.querySelectorAll('.tab').forEach(tab=>tab.addEventListener('click',()=>{activeTab=tab.dataset.tab;document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t===tab));render();}));
+  $('search').addEventListener('input',render);
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+  render();
+})();
+</script>
+</body>
+</html>
